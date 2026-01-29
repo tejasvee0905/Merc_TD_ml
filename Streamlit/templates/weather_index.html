@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Temperature Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(30, 30, 30, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #3498db;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #8B8B8B;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #1E1E1E;
+            border: 1px solid #2E2E2E;
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            background: #5dade2;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #1E1E1E;
+            border-radius: 8px;
+            border: 1px solid #2E2E2E;
+            text-align: center;
+            display: none;
+        }
+        
+        .result h2 {
+            color: #3498db;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .result p {
+            color: #FFFFFF;
+            font-size: 32px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WEATHER TEMPERATURE PREDICTION</h1>
+        
+        <form id="predictionForm">
+            <div class="form-group">
+                <label for="humidity">Humidity (%)</label>
+                <input type="number" id="humidity" name="humidity" step="0.1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="pressure">Atmospheric Pressure (hPa)</label>
+                <input type="number" id="pressure" name="pressure" step="0.1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="windspeed">Wind Speed (km/h)</label>
+                <input type="number" id="windspeed" name="windspeed" step="0.1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="cloudcover">Cloud Cover (%)</label>
+                <input type="number" id="cloudcover" name="cloudcover" step="0.1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="rainfall">Rainfall (mm)</label>
+                <input type="number" id="rainfall" name="rainfall" step="0.1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="sunshine">Sunshine Hours</label>
+                <input type="number" id="sunshine" name="sunshine" step="0.1" required>
+            </div>
+            
+            <button type="submit">Predict Temperature</button>
+        </form>
+        
+        <div class="result" id="result">
+            <h2>Predicted Temperature</h2>
+            <p id="temperature"></p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                humidity_percent: parseFloat(document.getElementById('humidity').value),
+                pressure_hpa: parseFloat(document.getElementById('pressure').value),
+                wind_speed_kmph: parseFloat(document.getElementById('windspeed').value),
+                cloud_cover_percent: parseFloat(document.getElementById('cloudcover').value),
+                rainfall_mm: parseFloat(document.getElementById('rainfall').value),
+                sunshine_hours: parseFloat(document.getElementById('sunshine').value)
+            };
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    document.getElementById('temperature').textContent = result.predicted_temperature + '°C';
+                    document.getElementById('result').style.display = 'block';
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error making prediction: ' + error);
+            }
+        });
+    </script>
+</body>
+</html>
